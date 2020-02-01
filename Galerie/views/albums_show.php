@@ -2,11 +2,11 @@
   <?php foreach ($photos as $photo) { ?>
     <div class="col-sm-3 col-md-3">
       <div class="thumbnail">
-        <a class="close" href="/index.php/gallery/photos_delete/<?=$album?>/<?=$photo['photo_name']?>">×</a>
+        <a class="close" href="/index.php/gallery/photos_delete/<?=$photo['photo_id']?>">×</a>
         <br> <br> 
         <a style="height: 200px; width: 400px; display: table-cell; vertical-align: middle; text-align: center;"
-           href="/index.php/gallery/photos_show/<?=$album?>/<?=$photo['photo_name']?>">
-          <img src="/<?=$photo['thumbnail_path']?>" alt="<?=$photo['photo_name']?>">
+           href="/index.php/gallery/photos_get/<?=$photo['photo_id']?>">
+          <img src="/index.php/gallery/photos_get/<?=$photo['photo_id']?>?thumbnail" alt="<?=$photo['photo_name']?>">
         </a>
         <div class="caption text-center"><?=$photo['photo_name']?><br></div>
       </div>

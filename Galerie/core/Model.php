@@ -11,7 +11,12 @@ class Model {
     global $config;
     self::$static_db = new PDO('sqlite:models/database.sqlite');
   }
+
+  public function inject_data($data) { return $data; }
+
+
 }
+
 
 Model::init();
 ?>

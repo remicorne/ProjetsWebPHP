@@ -4,7 +4,7 @@ $config = [
   'default_controller' => 'Gallery',
   'default_method' => 'index',
   'core_classes'=> ['Controller', 'Loader', 'Model'],
-  'models'=>['Gallery']
+  'models'=>['Gallery', 'Users', 'Sessions']
 ];
 
 
@@ -12,7 +12,7 @@ foreach ($config['core_classes'] as $classname) require "core/$classname.php";
 
 function generate_error_404($exception) {
   header("HTTP/1.0 404 Not Found");
-  $title = '';
+  $title = "HTTP/1.0 404 Not Found";
   include 'views/header.php';
   echo $exception->getMessage();
   include 'views/footer.php';
@@ -64,9 +64,9 @@ function create_controller($controller_name) {
 
 function call_controller_method($controller, $method_name, $parameters) {
  $reflectionObject = new ReflectionObject($controller);
-  if (! $reflectionObject->hasMethod($method_name)) { throw new Exception("$controller does not have $method_name method"); }
+  if (! $reflectionObject->hasMethod($method_name)) { throw new Exception("$method_name method does not exist"); }
   $reflectionMethod = $reflectionObject->getMethod($method_name);
-  if ($reflectionMethod->getNumberOfParameters()!=count($parameters)){ throw new Exception("invalid #args for $controller->$method_name method"); }
+  if ($reflectionMethod->getNumberOfParameters()!=count($parameters)){ throw new Exception("invalid #args for $method_name method"); }
   $reflectionMethod->invokeArgs($controller, $parameters);
 }
 
