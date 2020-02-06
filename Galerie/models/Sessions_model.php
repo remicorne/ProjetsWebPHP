@@ -21,7 +21,12 @@ class Sessions_model extends Model {
   
   public function logout() {
     session_destroy();
-    
+  }
+
+  public function inject_data($data) { 
+    $data['user_is_logged'] = $this->user_is_logged();
+    $data['logged_user'] = $this->logged_user();
+    return $data;
   }
   
 }

@@ -19,6 +19,7 @@ class Controller {
       require "models/$class.php";
       $variable = strtolower($model);
       $this->$variable = new $class();
+      $this->loader->add_model($variable, $this->$variable);
     }
   }
 ?>

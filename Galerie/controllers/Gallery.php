@@ -9,10 +9,12 @@ class Gallery extends Controller {
   }
 
   public function albums_new() {
+    if ($this->redirect_unlogged_user()) return;
     $this->loader->load('albums_new', ['title'=>'Création d\'un albumf']);
   }
   
   public function albums_create() {
+    if ($this->redirect_unlogged_user()) return;
     try {
       $album_name = filter_input(INPUT_POST, 'album_name');
       $this->gallery->create_album($album_name);
@@ -23,6 +25,7 @@ class Gallery extends Controller {
   }
   
   public function albums_delete($album_id) {
+    if ($this->redirect_unlogged_user()) return;
     try {
       $album_id = filter_var($album_id);
       $this->gallery->delete_album($album_id);
@@ -45,6 +48,7 @@ class Gallery extends Controller {
   }
   
   public function photos_new($album_id) {
+    if ($this->redirect_unlogged_user()) return;
     try {
       $album_id = filter_var($album_id);
       $this->gallery->check_if_album_exists($album_id);
@@ -58,6 +62,7 @@ class Gallery extends Controller {
   }
 
   public function photos_add($album_id) {
+    if ($this->redirect_unlogged_user()) return;
     try {
       $album_id = filter_var($album_id);
       $this->gallery->check_if_album_exists($album_id);
@@ -78,6 +83,7 @@ class Gallery extends Controller {
   }
   
   public function photos_delete($album_id, $photo_id) {
+    if ($this->redirect_unlogged_user()) return;
     try {
       $album_id = filter_var($album_id);
       $photo_id = filter_var($photo_id);
@@ -111,6 +117,14 @@ class Gallery extends Controller {
       header("Content-Type: image/jpeg"); // modification du header pour changer le format des données retourné au client
       echo $data;                          // écriture du binaire de l'image vers le client
     } catch (Exception $e) { header("Location: /index.php"); }
+  }
+
+  private function redirect_unlogged_user() {
+    if (!$this->sessions->user_is_logged()) {
+      header('Location: /index.php/sessions/sessions_new');
+      return true;
+    }
+    return false;
   }
 
 }
