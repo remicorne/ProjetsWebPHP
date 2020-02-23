@@ -18,11 +18,11 @@ class Gallery_model extends Model {
     }
   }
   
-  public function create_album($album_name) {
+  public function create_album($album_name, $user) {
     try {
       $this->check_album_name($album_name);
-      $statement = $this->db->prepare("insert into albums(album_name) values (:album_name)"); 
-      $statement->execute(['album_name' => $album_name]); 
+      $statement = $this->db->prepare("insert into albums(album_name, user_id) values (:album_name, :user_id)"); 
+      $statement->execute(['album_name' => $album_name, 'user_id' => $user->id]); 
       return $this->db->lastInsertId(); 
     } catch (PDOException $e) {
       throw new Exception(self::str_error_database);
@@ -60,7 +60,18 @@ class Gallery_model extends Model {
       throw new Exception(self::str_error_database);
     }
   }
-  
+
+  public function album_creator($album_id) {
+    try {      
+      $statement = $this->db->prepare("select user_id from albums where album_id = :album_id");
+      $statement->execute(['album_id' => $album_id]);
+      $result = $statement->fetchAll();
+      if (count($result) == 0) throw new Exception(self::str_error_album_does_not_exist);
+      return $result[0]['user_id'];
+    } catch (PDOException $e) {
+      throw new Exception(self::str_error_database);
+    }
+  }  
   public function photos($album_id) {
     try {
       $statement = $this->db->prepare("select photo_id, photo_name from photos where album_id = :album_id");
@@ -71,13 +82,14 @@ class Gallery_model extends Model {
     }
   }
   
-  public function add_photo($album_id, $photo_name, $tmp_file) {
+  public function add_photo($album_id, $photo_name, $user_id, $tmp_file) {
     try {
       $this->check_photo_name($photo_name);
-      $statement = $this->db->prepare("insert into photos(album_id, photo_name, fullsize, thumbnail) 
-                                              values (:album_id, :photo_name, :fullsize, :thumbnail)");
+      $statement = $this->db->prepare("insert into photos(album_id, photo_name, user_id, fullsize, thumbnail) 
+                                              values (:album_id, :photo_name, :user_id, :fullsize, :thumbnail)");
       $statement->execute(['album_id'=> $album_id, 
                            'photo_name'=>$photo_name,
+                           'user_id'=>$user_id,
                            'fullsize'=>$this->create_fullsize($tmp_file),
                            'thumbnail'=>$this->create_thumbnail($tmp_file)]);
       return $this->db->lastInsertId();

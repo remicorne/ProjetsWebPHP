@@ -4,17 +4,17 @@ class Loader {
 
   private $models = [ ];
 
-  public function view($view, $data = []) {
+  public function view($view, $data = [], $user) {
     foreach ($data as $key=>$value) $$key = $value;
     include "views/${view}.php";
   }
 
-  public function load($view = null, $data = []) {
+  public function load($view = null, $data = [], $user = null) {
     $this->define_helper();
     $data = $this->inject_model_data($data);
-    $this->view('header', $data);
-    if ($view!==null) $this->view($view, $data);
-    $this->view('footer', $data);
+    $this->view('header', $data, $user);
+    if ($view!==null) $this->view($view, $data, $user);
+    $this->view('footer', $data, $user);
   }
   
   public function define_helper() {

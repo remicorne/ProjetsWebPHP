@@ -5,7 +5,7 @@ class Gallery extends Controller {
   }
   
   public function albums() {
-    $this->loader->load('albums', ['title'=>'Albums', 'albums'=>$this->gallery->albums()]);
+    $this->loader->load('albums', ['title'=>'Albums', 'albums'=>$this->gallery->albums()], $this->sessions->logged_user());
   }
 
   public function albums_new() {
@@ -17,7 +17,7 @@ class Gallery extends Controller {
     if ($this->redirect_unlogged_user()) return;
     try {
       $album_name = filter_input(INPUT_POST, 'album_name');
-      $this->gallery->create_album($album_name);
+      $this->gallery->create_album($album_name, $this->sessions->logged_user());
       header('Location: /index.php/gallery/albums'); /* redirection du client vers la liste des albums. */
     } catch (Exception $e) {
       $this->loader->load('albums_new', ['title'=>'Création d\'un album', 'error_message' => $e->getMessage()]);
@@ -25,12 +25,12 @@ class Gallery extends Controller {
   }
   
   public function albums_delete($album_id) {
-    if ($this->redirect_unlogged_user()) return;
+    if ($this->redirect_unauthorized_user($this->gallery->album_creator($album_id))) return;
     try {
       $album_id = filter_var($album_id);
+      $this->gallery->check_if_album_exists($album_id);
       $this->gallery->delete_album($album_id);
-    } catch (Exception $e) { }
-    header('Location: /index.php/gallery/albums');
+    } catch (Exception $e) { header('Location: /index.php/gallery/albums'); }
   }
 
   public function albums_show($album_id) {
@@ -41,14 +41,14 @@ class Gallery extends Controller {
       $this->loader->load('albums_show', 
                           ['title'=>$album_name, 
                            'album'=>$album_id,
-                           'photos'=>$this->gallery->photos($album_id)]);
-    } catch (Exception $e) {
-      header("Location: /index.php/gallery/albums");
-    }
+                           'photos'=>$this->gallery->photos($album_id),
+                           'user_id'=>$this->gallery->album_creator($album_id)],
+                           $this->sessions->logged_user());
+    } catch (Exception $e) { header("Location: /index.php/gallery/albums"); }
   }
   
   public function photos_new($album_id) {
-    if ($this->redirect_unlogged_user()) return;
+    if ($this->redirect_unauthorized_user($this->gallery->album_creator($album_id))) return;
     try {
       $album_id = filter_var($album_id);
       $this->gallery->check_if_album_exists($album_id);
@@ -56,13 +56,14 @@ class Gallery extends Controller {
       $this->loader->load('photos_new', 
                         ['title'=>"Ajout d'une photo dans l'album $album_name",
                         'album'=>$album_id,
-                        'album_name'=>$this->gallery->album_name($album_id)]);
+                        'album_name'=>$this->gallery->album_name($album_id),
+                        'user_id'=>$this->gallery->album_creator($album_id)]);
     }
     catch (Exception $e) { header("Location: /index.php/gallery/albums");}
   }
 
-  public function photos_add($album_id) {
-    if ($this->redirect_unlogged_user()) return;
+  public function photos_add($album_id) { 
+    if ($this->redirect_unauthorized_user($this->gallery->album_creator($album_id))) return;
     try {
       $album_id = filter_var($album_id);
       $this->gallery->check_if_album_exists($album_id);
@@ -73,7 +74,7 @@ class Gallery extends Controller {
       if (!isset($_FILES['photo']) || $_FILES['photo']['error'] !== UPLOAD_ERR_OK) {     
         throw new Exception('Vous devez choisir une photo.');
         }
-      $this->gallery->add_photo($album_id, $photo_name, $_FILES['photo']['tmp_name']);
+      $this->gallery->add_photo($album_id, $photo_name, $this->sessions->logged_user(), $_FILES['photo']['tmp_name']);
       header("Location: /index.php/gallery/albums_show/$album_id");
     } catch (Exception $e) {
       $this->loader->load('photos_new', ['album_name'=>$album_name, 'album'=>$album_id,
@@ -82,8 +83,8 @@ class Gallery extends Controller {
     }
   }
   
-  public function photos_delete($album_id, $photo_id) {
-    if ($this->redirect_unlogged_user()) return;
+  public function photos_delete($album_id, $photo_id) { 
+    if ($this->redirect_unauthorized_user($this->gallery->album_creator($album_id))) return;
     try {
       $album_id = filter_var($album_id);
       $photo_id = filter_var($photo_id);
@@ -127,6 +128,11 @@ class Gallery extends Controller {
     return false;
   }
 
+  private function redirect_unauthorized_user($user_id) {
+      if (!$this->sessions->user_is_logged() || $this->sessions->logged_user()->id !== $user_id) {
+          throw new Exception("don't fuck with me");
+      }
+  }
 }
 
 

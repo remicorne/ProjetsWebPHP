@@ -14,7 +14,7 @@
 <?php $rank = 0; foreach ($ranking as $teamNum=>$teamStats) { $rank++ ?>
 <tr>
  <td><?=$rank?></td>
- <td><a href="/Football/index.php/Soccer/team/<?=$teamNum?>"><?=$team_names[$teamNum]?></a></td>
+ <td><a href="/index.php/Soccer/team/<?=$teamNum?>"><?=$team_names[$teamNum]?></a></td>
  <?php foreach ($teamStats as $result) { ?>
  <td><?=$result?></td>
  <?php } ?>

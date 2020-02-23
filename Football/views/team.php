@@ -1,4 +1,4 @@
-<h3><a href="/Football/index.php/Soccer/ranking">Classement</a></h3><br>
+<h3><a href="/index.php/Soccer/ranking">Classement</a></h3><br>
 <table class="table">
  <tr>
   <th>N°</th>
@@ -28,7 +28,6 @@
 
 <h3>Matchs</h3><br>
 
-//retaper cett fonction infame
 <?php function team_order($gameInfo, $whichTeam, $id, $team_names, $gameNum) {
     if ($whichTeam == 0) $otherTeam = 1;
     if ($whichTeam == 1) $otherTeam = 0;
@@ -36,7 +35,7 @@
     if ($whichTeam == 0) { ?>
         <td> 
         <?php if ($gameInfo['teams'][$whichTeam] != $id) { ?>
-        <a href="/Football/index.php/Soccer/team/<?=$gameInfo['teams'][$whichTeam]?>">
+        <a href="/index.php/Soccer/team/<?=$gameInfo['teams'][$whichTeam]?>">
         <?php } if ($isWinner) { ?>
         <b>
         <?php } ?>
@@ -46,7 +45,7 @@
         <?php if ($gameInfo['teams'][$whichTeam] != $id) ?>
         </a>
         </td>
-        <td><a href="/Football/index.php/Soccer/game/<?=$gameNum?>">
+        <td><a href="/index.php/Soccer/game/<?=$gameNum?>">
         <?php if ($isWinner) ?>
         <b>
         <?=$gameInfo['goal_counts'][$whichTeam]?> -   
@@ -63,7 +62,7 @@
         </td>
         <td> 
         <?php if ($gameInfo['teams'][$whichTeam] != $id) { ?>
-        <a href="/Football/index.php/Soccer/team/<?=$gameInfo['teams'][$whichTeam]?>">
+        <a href="/index.php/Soccer/team/<?=$gameInfo['teams'][$whichTeam]?>">
         <?php } if ($isWinner) { ?>
         <b>
         <?php } ?>
